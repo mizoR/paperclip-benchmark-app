@@ -18,10 +18,10 @@ namespace 'performance' do
     users = User.all.to_a
 
     original = Paperclip::Interpolations
-    alter    = Paperclip::AlterInterpolator.new
+    custom    = Paperclip::CustomInterpolator.new
 
     puts_avatar avatar: users[0].avatar, interpolator: original
-    puts_avatar avatar: users[0].avatar, interpolator: alter
+    puts_avatar avatar: users[0].avatar, interpolator: custom
 
     Benchmark.ips do |x|
       x.config(time: 10)
@@ -35,9 +35,9 @@ namespace 'performance' do
         end
       end
 
-      x.report interpolator_name(alter) do
+      x.report interpolator_name(custom) do
         users.each do |user|
-          user.avatar.instance_variable_set :@interpolator, alter
+          user.avatar.instance_variable_set :@interpolator, custom
           user.avatar.url
           user.avatar.url :large
           user.avatar.url :thumb

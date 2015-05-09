@@ -1,5 +1,5 @@
 module Paperclip
-  class AlterInterpolator
+  class CustomInterpolator
     include Interpolations
 
 
