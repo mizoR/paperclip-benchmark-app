@@ -1,14 +1,26 @@
 require 'benchmark/ips'
 
 namespace 'performance' do
+  def puts_avatar(avatar: , interpolator:)
+    puts interpolator.class
+    puts avatar.instance_variable_set :@interpolator, interpolator
+    puts avatar.url
+    puts avatar.url :large
+    puts avatar.url :thumb
+    puts
+  end
+
   task 'test' => :environment do
     users = User.all.to_a
 
+    original = Paperclip::Interpolations
+    alter    = Paperclip::AlterInterpolator.new
+
+    puts_avatar avatar: users[0].avatar, interpolator: original
+    puts_avatar avatar: users[0].avatar, interpolator: alter
+
     Benchmark.ips do |x|
       x.config(time: 10)
-
-      original = Paperclip::Interpolations
-      alter    = Paperclip::AlterInterpolator.new
 
       x.report 'Original interpolator' do
         users.each do |user|
