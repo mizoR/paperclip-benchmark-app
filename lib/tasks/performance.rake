@@ -2,12 +2,16 @@ require 'benchmark/ips'
 
 namespace 'performance' do
   def puts_avatar(avatar: , interpolator:)
-    puts interpolator.class
-    puts avatar.instance_variable_set :@interpolator, interpolator
+    avatar.instance_variable_set :@interpolator, interpolator
+    puts interpolator_name(interpolator)
     puts avatar.url
     puts avatar.url :large
     puts avatar.url :thumb
     puts
+  end
+
+  def interpolator_name(interpolator)
+    interpolator.is_a?(Module) ? interpolator.name : interpolator.class.name
   end
 
   task 'test' => :environment do
@@ -22,7 +26,7 @@ namespace 'performance' do
     Benchmark.ips do |x|
       x.config(time: 10)
 
-      x.report 'Original interpolator' do
+      x.report interpolator_name(original) do
         users.each do |user|
           user.avatar.instance_variable_set :@interpolator, original
           user.avatar.url
@@ -31,7 +35,7 @@ namespace 'performance' do
         end
       end
 
-      x.report 'Alter interpolator' do
+      x.report interpolator_name(alter) do
         users.each do |user|
           user.avatar.instance_variable_set :@interpolator, alter
           user.avatar.url
